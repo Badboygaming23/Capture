@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Information Capture</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            margin: 10px 0;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #infoDisplay {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #e9ecef;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        #infoDisplay h2 {
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+
+        #infoDisplay p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        /* Loading screen styles */
+        #loadingScreen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .loader {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Device Information Capture</h1>
+        <button id="captureInfo">Capture Device Info</button>
+        <div id="infoDisplay"></div>
+    </div>
+
+    <!-- Loading screen -->
+    <div id="loadingScreen">
+        <div class="loader"></div>
+    </div>
+
+    <script>
+        document.getElementById('captureInfo').addEventListener('click', function () {
+            // Show loading screen
+            document.getElementById('loadingScreen').style.display = 'flex';
+
+            const os = getOS();
+            const deviceName = navigator.userAgent;
+            const browser = getBrowser();
+            const cookies = document.cookie;
+
+            // For IP Address, use a free IP API
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    const ip = data.ip;
+                    displayInfo(os, deviceName, browser, ip, cookies);
+                })
+                .catch(error => {
+                    console.error('Error fetching IP:', error);
+                    displayInfo(os, deviceName, browser, 'Unable to fetch IP', cookies);
+                });
+        });
+
+        function getOS() {
+            const userAgent = navigator.userAgent;
+            let os = "Unknown OS";
+
+            if (userAgent.indexOf("Win") !== -1) os = "Windows";
+            else if (userAgent.indexOf("Mac") !== -1) os = "MacOS";
+            else if (userAgent.indexOf("X11") !== -1 || userAgent.indexOf("Linux") !== -1) os = "Linux";
+            else if (userAgent.indexOf("Android") !== -1) os = "Android";
+            else if (userAgent.indexOf("like Mac") !== -1) os = "iOS";
+
+            return os;
+        }
+
+        function getBrowser() {
+            const userAgent = navigator.userAgent;
+            let browser = "Unknown Browser";
+
+            if (userAgent.includes("Chrome") && !userAgent.includes("Edg")) {
+                browser = "Google Chrome";
+            } else if (userAgent.includes("Firefox")) {
+                browser = "Mozilla Firefox";
+            } else if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) {
+                browser = "Apple Safari";
+            } else if (userAgent.includes("MSIE") || userAgent.includes("Trident")) {
+                browser = "Internet Explorer";
+            } else if (userAgent.includes("Edg")) {
+                browser = "Microsoft Edge";
+            } else if (userAgent.includes("Opera") || userAgent.includes("OPR")) {
+                browser = "Opera";
+            }
+
+            return browser;
+        }
+
+        function displayInfo(os, deviceName, browser, ip, cookies) {
+            // Hide loading screen
+            document.getElementById('loadingScreen').style.display = 'none';
+
+            const infoDisplay = document.getElementById('infoDisplay');
+            infoDisplay.innerHTML = `
+                <h2>Captured Information</h2>
+                <p><strong>Operating System:</strong> ${os}</p>
+                <p><strong>Device Name:</strong> ${deviceName}</p>
+                <p><strong>Browser:</strong> ${browser}</p>
+                <p><strong>IP Address:</strong> ${ip}</p>
+                <p><strong>Cookies:</strong> ${cookies || 'No cookies available'}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
