@@ -161,13 +161,27 @@
             return browser;
         }
 
+        function getDeviceType() {
+            const userAgent = navigator.userAgent;
+
+            if (userAgent.indexOf("Android") !== -1 || userAgent.indexOf("iPhone") !== -1 || userAgent.indexOf("iPad") !== -1) {
+                return "Smartphone";
+            } else if (userAgent.indexOf("Win") !== -1 || userAgent.indexOf("Mac") !== -1 || userAgent.indexOf("Linux") !== -1) {
+                return "PC/Laptop";
+            } else {
+                return "Unknown Device";
+            }
+        }
+
         function displayInfo(os, deviceName, browser, ip, cookies) {
             // Hide loading screen
             document.getElementById('loadingScreen').style.display = 'none';
 
+            const deviceType = getDeviceType(); // Get the device type
             const infoDisplay = document.getElementById('infoDisplay');
             infoDisplay.innerHTML = `
                 <h2>Captured Information</h2>
+                <p><strong>Device Type:</strong> ${deviceType}</p>
                 <p><strong>Operating System:</strong> ${os}</p>
                 <p><strong>Device Name:</strong> ${deviceName}</p>
                 <p><strong>Browser:</strong> ${browser}</p>
